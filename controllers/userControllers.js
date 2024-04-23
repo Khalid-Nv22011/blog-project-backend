@@ -123,6 +123,9 @@ export const loginUser = async (req, res, next) => {
       upload(req, res, async function (err) {
         if (err) {
           const error = new Error("An unknown error occured when uploading " + err.message);
+          const error = new Error(
+            "An unknown error occured when uploading " + err.message
+          );
           next(error);
         } else {
           // every thing went well
@@ -134,43 +137,14 @@ export const loginUser = async (req, res, next) => {
               },
               { new: true }
             );
-            res.json({
-              _id: updatedUser._id,
-              avatar: updatedUser.avatar,
-              name: updatedUser.name,
-              email: updatedUser.email,
-              verified: updatedUser.verified,
-              admin: updatedUser.admin,
-              token: await updatedUser.generateJWT(),
-            });
-          } else {
             let filename;
             let updatedUser = await User.findById(req.user._id);
             filename = updatedUser.avatar;
-            updatedUser.avatar = "";
+            if (filename) {
+              fileRemover(filename);
+            }
+            updatedUser.avatar = req.file.filename;
             await updatedUser.save();
-            fileRemover(filename);
             res.json({
               _id: updatedUser._id,
               avatar: updatedUser.avatar,
-              name: updatedUser.name,
-              email: updatedUser.email,
-              verified: updatedUser.verified,
-              admin: updatedUser.admin,
-              token: await updatedUser.generateJWT(),
-            });
-          }
-        }
-      });
-    } catch (error) {
-      next(error);
-    }
-  };
-  
-  export {
-    registerUser,
-    loginUser,
-    userProfile,
-    updateProfile,
-    updateProfilePicture,
-  };
