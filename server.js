@@ -1,7 +1,10 @@
 import express from "express";
 import dotenv from "dotenv";
 import connectDB from "./db";
-
+import {
+  errorResponserHandler,
+  invalidPathHandler,
+} from "./middleware/errorHandler";
 // Routes
 
 
@@ -14,6 +17,8 @@ app.get("/", (req, res) => {
   res.send("Server is running...");
 });
 
+app.use(invalidPathHandler);
+app.use(errorResponserHandler);
 
 
 const PORT = process.env.PORT || 5000;
